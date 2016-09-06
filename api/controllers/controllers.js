@@ -1,7 +1,10 @@
+
+var dbconn = require("../data/dbconnections.js");
 var ctrlData = require('../data/hotel-data.json');
 
 module.exports.getAll = function(req, res) {
-
+	var db = dbconn.get();
+	console.log("db connection open at controller",  db);
   console.log('GET the data from ctrl');
   console.log(req.query);
 
@@ -17,7 +20,7 @@ module.exports.getAll = function(req, res) {
     count = parseInt(req.query.count, 10);
   }
 
-  returnData = hotelData.slice(offset,offset+count);
+  returnData = ctrlData.slice(offset,offset+count);
 
   res
     .status(200)
