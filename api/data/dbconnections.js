@@ -1,5 +1,5 @@
 var MongoClient = require("mongodb").MongoClient;
-var dburl = "mongodb://localhost:2701/mean";
+var dburl = "mongodb://localhost:27017/mean";
 
 var _connection = null;
 var open = function () {
