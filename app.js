@@ -10,8 +10,9 @@ console.log(answer);
 goodbye();
 
 /*express*/
-
-require("./api/data/dbconnections.js").open();
+/*mongoose*/
+require("./api/data/db.js");
+/*require("./api/data/dbconnections.js").open();*/
 var express = require("express");
 var app = express();
 var path = require("path");
