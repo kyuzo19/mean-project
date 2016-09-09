@@ -27,7 +27,6 @@
   },
   "devDependencies": {
     "mocha": "^3.0.2",
-    "mongodb": "^2.2.9",
-    "nodemon": "^1.10.2"
+    "mongodb": "^2.2.9"
   }
 }

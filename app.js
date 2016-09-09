@@ -12,6 +12,7 @@ goodbye();
 /*express*/
 /*mongoose*/
 require("./api/data/db.js");
+/*mongodb*/
 /*require("./api/data/dbconnections.js").open();*/
 var express = require("express");
 var app = express();

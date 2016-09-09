@@ -16,5 +16,21 @@ process.on("SIGINT", function () {
 	mongoose.connection.close(function(){
 		console.log("mongoose disconnected through app termination (SIGINT)");
 		process.exit(0);
-	})
-})
+	});
+});
+
+process.on("SIGTERM", function () {
+	mongoose.connection.close(function(){
+		console.log("mongoose disconnected through app termination (SIGNTERM)");
+		process.exit(0);
+	});
+});
+
+process.once("SIGUSR2", function () {
+	mongoose.connection.close(function(){
+		console.log("mongoose disconnected through app termination (SIGUSR2)");
+		process.kill(process.pid, "SIGUSR2");
+	});
+});
+
+require("./hotels.model.js");
