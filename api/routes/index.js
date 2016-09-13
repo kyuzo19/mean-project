@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var ctrl = require("../controllers/controllers.js");
+var  ctrlReviews = require("../controllers/review.ctrl.js")
 
 router
 	.route("/ctrl")
@@ -18,5 +19,11 @@ router
 router	
 	.route("/ctrl/new")
 	.post(ctrl.addOne);
+router
+	.route("/ctrl/:ctrlId/reviews")
+	.get(ctrlReviews.reviewsGetAll);
+router
+	.route("/ctrl/:ctrlId/reviews/:reviewId")
+	.get(ctrlReviews.reviewsGetOne);
 
 module.exports = router;
