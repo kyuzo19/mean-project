@@ -6,12 +6,7 @@ var  ctrlReviews = require("../controllers/review.ctrl.js")
 router
 	.route("/ctrl")
 	.get(ctrl.getAll)
-	.post(function (req, res) {
-		console.log("post json route");
-		res
-			.status(200)
-			.json({"jsonData": "post received"});
-	});
+	.post(ctrl.addOne);
 router
 	.route("/ctrl/:ctrlId")
 	.get(ctrl.getOne);
@@ -21,7 +16,9 @@ router
 	.post(ctrl.addOne);
 router
 	.route("/ctrl/:ctrlId/reviews")
-	.get(ctrlReviews.reviewsGetAll);
+	.get(ctrlReviews.reviewsGetAll)
+	.post(ctrlReviews.reviewAddOne)
+
 router
 	.route("/ctrl/:ctrlId/reviews/:reviewId")
 	.get(ctrlReviews.reviewsGetOne);

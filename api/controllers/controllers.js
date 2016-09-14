@@ -31,15 +31,15 @@ var runGeoQuery = function (req, res) {
 	
 };
 
+
 module.exports.getAll = function(req, res) {
 	/*var db = dbconn.get();
-	var collection = db.collection("hotel");
-	*/
-	var offset = 0;
+	var collection = db.collection("hotel");*/                                                  console.log("get all hotels");                                                                                                                                                            var offset = 0;
 	var count = 5;
-	
+    var maxCount = 10;
+ 
 	if (req.query && req.query.lat && req.query.lng) {
-		runGeoQuery(req,res)
+		runGeoQuery(req, res)
 		return;
 	}
 
@@ -51,12 +51,39 @@ module.exports.getAll = function(req, res) {
 		count = parseInt(req.query.count, 10);
 	}
 	
+	if (isNaN(offset) || isNaN(count)) {
+		res
+			.status(400)
+			.json({
+				"message" : "if supplied in query string count and offset should be"
+			});
+		return;
+	}
+	
+	if (count > maxCount) {
+		res
+			.status(400)
+			.json({
+				"message" : "count limit of " + maxCount + " exceeeded"
+			});
+	}
+	
 	Hotel	
 		.find()
+		.skip(offset)
+		.limit(count)
 		.exec(function (err, hotels) {
-		console.log("Hotel length: ", hotels.length);
-		res
-			.json(hotels)
+		
+			if (err) {
+				console.log("error findings hotels");
+				res
+					.status(500)
+					.json(err);
+			} else {
+				console.log("Hotel length: ", hotels.length);
+				res
+					.json(hotels)
+			}	
 	});
 	
 	/*collection
@@ -95,9 +122,27 @@ module.exports.getOne = function(req, res) {
 	Hotel	
 		.findById(ctrlId)
 		.exec( function (err, doc) {
-			res
-				.status(200)
-				.json(doc)
+			var response = {
+				status : 200,
+				message : doc
+			}
+		
+			if (err) {
+				console.log("error findings hotels");
+				response.status = 500;
+				response.message = err;
+					
+			} else if (!doc) {
+				response.status = 404;
+				response.message = {
+						"message" : "hotel id not found"
+					};
+			}  
+				res
+					.status(response.status)
+					.json(response.message);
+			
+			
 		})
 	
 	/*collection
@@ -112,8 +157,19 @@ module.exports.getOne = function(req, res) {
   	
 };
 
+//helper function
+var _splitArray = function (input) {
+	var output;
+	if (input && input.length > 0) {
+		output = input.split(";");
+	} else {
+		output = [];
+	}
+	return output;
+}
+
 module.exports.addOne = function(req, res) {
-	var db = dbconn.get();
+	/*var db = dbconn.get();
 	var collection = db.collection("hotel");
 	var  Hotel;
 	
@@ -136,6 +192,34 @@ module.exports.addOne = function(req, res) {
 			.status(400)
 			.json({ message : "required data missing from body"})
 	}
-  console.log("POST new hotel");
+  console.log("POST new hotel");*/
   
+	Hotel
+		.create({
+			name: req.body.name,
+			description: req.body.description,
+			stars : parseInt(req.body.stars, 10),
+			services : req.body.services,
+			photos : req.body.photos,
+			currency : req.body.currency,
+			location : {
+				address : req.body.address,
+				coordinates : [
+					parseFloat(req.body.lng), parseFloat(req.body.lat)
+				]
+			}
+			
+		}, function (err, hotel) {
+			if (err) {
+				console.log("error creating hotel");
+				res
+					.status(400)
+					.json(err)
+			}	else {
+				console.log("hotel created", hotel );
+				res
+					.status(201)
+					.json(hotel);
+			}
+		})
 };
