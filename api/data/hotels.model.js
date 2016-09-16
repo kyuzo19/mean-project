@@ -10,11 +10,24 @@ var roomSchema = new mongoose.Schema({
 });
 
 var reviewSchema = new mongoose.Schema({
-	name: String,
-	id: String,
-	review: String,
-	rating: Number
-	
+	name: {
+        type : String,
+        required: true
+    },
+	review: {
+        type: String,
+        required : true
+    },
+	rating: {
+        type : Number,
+        required: true,
+        min : 0,
+        max : 5
+    },
+    createdon: {
+        type: Date,
+        "default": Date.now
+    }	
 });
 
 var hotelSchema = new mongoose.Schema({
@@ -38,7 +51,7 @@ var hotelSchema = new mongoose.Schema({
 		coordinates: {
 			type: [Number],
 			//longitude e/w latitude  n/s
-			index: "2sphere"
+			index: "2dsphere"
 		}
 	},
 	reviews: [reviewSchema],

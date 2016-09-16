@@ -199,13 +199,14 @@ module.exports.addOne = function(req, res) {
 			name: req.body.name,
 			description: req.body.description,
 			stars : parseInt(req.body.stars, 10),
-			services : req.body.services,
-			photos : req.body.photos,
+			services : _splitArray(req.body.services),
+			photos : _splitArray(req.body.photos),
 			currency : req.body.currency,
 			location : {
 				address : req.body.address,
 				coordinates : [
-					parseFloat(req.body.lng), parseFloat(req.body.lat)
+					parseFloat(req.body.lng), 
+                    parseFloat(req.body.lat)
 				]
 			}
 			
@@ -223,3 +224,88 @@ module.exports.addOne = function(req, res) {
 			}
 		})
 };
+
+module.exports.updateOne = function (req, res) {
+	var ctrlId = req.params.ctrlId;
+	console.log('GET hotelId', req.params.ctrlId);
+	
+	Hotel	
+		.findById(ctrlId)
+		.select("-reviews -rooms")
+		.exec( function (err, doc) {
+			var response = {
+				status : 200,
+				message : doc
+			}
+		
+			if (err) {
+				console.log("error findings hotels");
+				response.status = 500;
+				response.message = err;
+					
+			} else if (!doc) {
+				response.status = 404;
+				response.message = {
+						"message" : "hotel id not found"
+					};
+			}  
+		
+			if (response.status !== 200) {
+				res
+					.status(response.status)
+					.json(response.message);
+			} else {
+				doc.name = req.body.name;
+				doc.description =  req.body.description,
+				doc.stars = parseInt(req.body.stars, 10),
+				doc.services = _splitArray(req.body.services),
+				doc.photos = _splitArray(req.body.photos),
+				doc.currency = req.body.currency,
+				doc.location = {
+					address : req.body.address,
+					coordinates : [
+						parseFloat(req.body.lng), 
+						parseFloat(req.body.lat)
+					]
+				}
+			}
+			doc.save(function (err, updated) {
+				if(err) {
+					res
+						.status(500)
+						.json(err);
+				} else {
+					res
+						.status(204)
+						.json()
+				}
+			})
+				
+			
+			
+		})
+};
+
+module.exports.reviewUpdateOne = function (req, res) {
+	
+};
+
+module.exports.deleteOne = function (req, res) {
+	var ctrlId  =req.params.ctrlId;
+	
+	Hotel
+		.findByIdAndRemove(ctrlId)
+		.exec(function(err, hotel){
+		if (err) {
+			res
+				.status(404)
+				.json(err);
+		} else {
+			console.log("hotel deleted, id", hotelId);
+			res	
+				.status(204)
+				.json();
+		}
+	})
+};
+

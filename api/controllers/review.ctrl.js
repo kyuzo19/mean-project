@@ -92,3 +92,59 @@ module.exports.reviewAddOne = function (req, res) {
 
 	
 };
+
+module.exports.deleteOneReview = function (req, res) {
+	var ctrlId = req.params.ctlId;
+	var reviewId = req.params.reviewId;
+	
+	
+	Hotel	
+		.findById(ctrlId)
+		.select("reviews")
+		.exec(function (err, hotel) {
+			var thisReview;
+			var response = {
+				status: 200,
+				message : {}
+			};
+		
+		if (err) {
+			response.status = 500;
+			response.message = err;
+		} else if (!hotel) {
+			response.status = 404;
+			response.message = {
+				"message" : "hotel ID not found " + id
+			}
+		}
+		else {
+			thisReview = hotel.review.id(reviewId);
+			
+			if (!thisReview) {
+				response.status = 404;
+				response.message = {
+					"message" : "Review ID not found" + reviewId
+				};
+			}
+		}
+		if ( response.status !== 200) {
+			res
+				.status(response.status)
+				.json(response.message)
+		
+		} else {
+			hotel.reviews.id(reviewId).remove();
+			hotel.save(function (err, hotelupdated) {
+				if(err) {
+					res	
+						.status(500)
+						.json(er)
+				} else {
+					res	
+						.status(204)
+						.json()
+				}
+			})
+		}
+		})
+};

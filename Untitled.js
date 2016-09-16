@@ -1,9 +1,12 @@
 db.hotels.update(
 	{},
 	{
-		$unset: {
-			"reviews.1._id" : ObjectId()
+		$set: {
+			"reviews.0._id" : ObjectId()
 		}
+	},
+	{
+		multi: true
 	}
 )
 
