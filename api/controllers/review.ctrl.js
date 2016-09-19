@@ -94,9 +94,9 @@ module.exports.reviewAddOne = function (req, res) {
 };
 
 module.exports.deleteOneReview = function (req, res) {
-	var ctrlId = req.params.ctlId;
+	var ctrlId = req.params.ctrlId;
 	var reviewId = req.params.reviewId;
-	
+	console.log("PUT reviewID " + reviewId + " for ctrlId " + ctrlId);
 	
 	Hotel	
 		.findById(ctrlId)
@@ -107,17 +107,34 @@ module.exports.deleteOneReview = function (req, res) {
 				status: 200,
 				message : {}
 			};
-		
+		console.log(hotel);
 		if (err) {
+			response.status = 500;
+			response.message = err;
+		} 
+		hotel.reviews.id(reviewId).remove();
+		hotel.save(function (err, hotelUpdated) {
+			if(err) {
+				res	
+					.status(500)
+					.json(err)
+			} else {
+				res	
+					.status(204)
+					.json()
+			}
+		});
+		
+		
+	/*	if (err) {
 			response.status = 500;
 			response.message = err;
 		} else if (!hotel) {
 			response.status = 404;
 			response.message = {
 				"message" : "hotel ID not found " + id
-			}
-		}
-		else {
+			};
+		} else {
 			thisReview = hotel.review.id(reviewId);
 			
 			if (!thisReview) {
@@ -133,8 +150,8 @@ module.exports.deleteOneReview = function (req, res) {
 				.json(response.message)
 		
 		} else {
-			hotel.reviews.id(reviewId).remove();
-			hotel.save(function (err, hotelupdated) {
+			hotel.reviews._id(reviewId).remove();
+			hotel.save(function (err, hotelUpdated) {
 				if(err) {
 					res	
 						.status(500)
@@ -144,7 +161,7 @@ module.exports.deleteOneReview = function (req, res) {
 						.status(204)
 						.json()
 				}
-			})
-		}
-		})
+			});
+		}*/
+		});
 };

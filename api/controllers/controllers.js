@@ -34,7 +34,9 @@ var runGeoQuery = function (req, res) {
 
 module.exports.getAll = function(req, res) {
 	/*var db = dbconn.get();
-	var collection = db.collection("hotel");*/                                                  console.log("get all hotels");                                                                                                                                                            var offset = 0;
+	var collection = db.collection("hotel");*/      
+	console.log("get all hotels");           
+	var offset = 0;
 	var count = 5;
     var maxCount = 10;
  

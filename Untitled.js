@@ -11,8 +11,56 @@ db.hotels.update(
 )
 
 
-[
-	{"dis":0,"obj":
-	 {"name":"Hotel Quirinale",
-	  "description":"Set in a 19th-century building, the Quirinale 	is 10 minutes' walk from the Coliseum. This historic hotel is connected to Rome Opera House through a passageway in its leafy courtyard. Rooms come with free Wi-Fi.\nHotel Quirinale's spacious rooms are uniquely decorated and feature classic furnishings and parquet floors. Each room offers a flat-screen TV with satellite and pay-per-view channels. Some rooms overlook the small garden and courtyard.\nThe hotel's continental breakfast can be enjoyed outdoors in fine weather. There is also an à la carte restaurant, and the hotel's Opera Bistrot is open all afternoon for more informal meals.\nThe Quirinale is located 200 metres from Repubblica Metro Station. The Spanish Steps and the Trevi Fountain are both within a 15-minute walk, while Vatican City can be reached by car in 10 minutes.\nCentral Station is a great choice for travellers interested in monuments, architecture and ancient landmarks.",
-	  "currency":"€","_id":"57d8b8ae51ca655566b4ad48","reviews":[{"name":"Tamas","id":"/user/tamas.json","review":"Great hotel","rating":4,"_id":"57d8c38f20625d5a932305b5"}],"location":{"address":"Via Nazionale 7, Central Station, 00184 Rome, Italy","coordinates":[41.901707,12.494887]},"rooms":[{"type":"Small Double or Twin Room","number":10,"description":"These are small rooms","price":420.5,"photos":["/photos/room/hotelquirinale/2.jpg","/photos/room/hotelquirinale/5.jpg"]},{"type":"Standard Double or Twin Room","number":25,"description":"These are double rooms","price":475,"photos":["/photos/room/hotelquirinale/4.jpg","/photos/room/hotelquirinale/6.jpg"]},{"type":"Superior Double or Twin Room","number":3,"description":"Amazing suites","price":560.5,"photos":["/photos/room/hotelquirinale/7.jpg"]},{"type":"Executive Double or Twin Room","number":13,"description":"Amazing suites","price":1000.5,"photos":["/photos/room/hotelquirinale/7.jpg"]},{"type":"Suite","number":13,"description":"Very exclusive suites","price":1300,"photos":["/photos/room/hotelquirinale/7.jpg"]}],"photos":["/photos/hotel/hotelquirinale/1.jpg","/photos/hotel/hotelquirinale/2.jpg","/photos/hotel/hotelquirinale/3.jpg","/photos/hotel/hotelquirinale/4.jpg"],"services":["Room service","Car hire","24-hour front desk","Currency exchange","Tour desk","Ticket service","Luggage storage","Babysitting/child services","Laundry","Dry cleaning","Ironing service","Meeting/banquet facilities","Business centre","Fax/photocopying"],"stars":4}},{"dis":836.838563943379,"obj":{"name":"Grand Hotel Palatino","description":"Just a 5-minute walk from the Coliseum and 100 metres from Cavour Metro, Grand Hotel Palatino is in Rome's Monti District. It offers an American bar and 2 restaurants. Wi-Fi is free throughout. Rooms at the Grand Hotel are air conditioned and come with a minibar and satellite TV. Some have views of Rome’s rooftops.\nLe Erbe restaurant offers international cuisine in elegant surroundings, while Le Spighe specialises in Roman dishes and classic Italian cooking. Breakfast starts at 06:30.\nThe Forum and the Parco di Traiano are both less than a 10-minute walk from the hotel. Termini Train Station is one metro stop away, as is Esquilino with its markets and many ethnic restaurants.\nRione Monti is a great choice for travellers interested in sightseeing, food and monuments.","currency":"€","_id":"57d8b8ae51ca655566b4ad45","reviews":[{"name":"Tamas","id":"/user/tamas.json","review":"Great hotel","rating":4,"_id":"57d8c38f20625d5a932305b5"},{"name":"Steve","id":"/user/steve.json","review":"Awesome place!","rating":5}],"location":{"address":"Via Cavour 213, Rione Monti, 00184 Rome, Italy","coordinates":[41.894493,12.492259]},"rooms":[{"type":"Standard Plus Double Room","number":10,"description":"These are small rooms","price":312.5,"photos":["/photos/room/grandhotelpalatino/2.jpg","/photos/room/grandhotelpalatino/5.jpg"]},{"type":"Executive Double Room","number":25,"description":"These are double rooms","price":322.5,"photos":["/photos/room/grandhotelpalatino/4.jpg","/photos/room/grandhotelpalatino/6.jpg"]},{"type":"Superior Double Room","number":3,"description":"Amazing suites","price":352.5,"photos":["/photos/room/grandhotelpalatino/7.jpg"]},{"type":"Standard Plus Triple Room","number":13,"description":"Amazing suites","price":452.5,"photos":["/photos/room/grandhotelpalatino/7.jpg"]},{"type":"Junior Suite","number":13,"description":"Very exclusive suites","price":1400,"photos":["/photos/room/grandhotelpalatino/7.jpg"]}],"photos":["/photos/hotel/grandhotelpalatino/1.jpg","/photos/hotel/grandhotelpalatino/2.jpg","/photos/hotel/grandhotelpalatino/3.jpg"],"services":["Room service","Airport shuttle (surcharge)","24-hour front desk","Currency exchange","Tour desk","Luggage storage","Concierge service","Laundry","Dry cleaning","Ironing service","Meeting/banquet facilities","Business centre","VIP room facilities"],"stars":4}}]
+var hotelId = req.params.hotelId;
+  var reviewId = req.params.reviewId;
+  console.log('PUT reviewId ' + reviewId + ' for hotelId ' + hotelId);
+
+  Hotel
+    .findById(hotelId)
+    .select('reviews')
+    .exec(function(err, hotel) {
+      var thisReview;
+      var response = {
+        status : 200,
+        message : {}
+      };
+      if (err) {
+        console.log("Error finding hotel");
+        response.status = 500;
+        response.message = err;
+      } else if(!hotel) {
+        console.log("Hotel id not found in database", id);
+        response.status = 404;
+        response.message = {
+          "message" : "Hotel ID not found " + id
+        };
+      } else {
+        // Get the review
+        thisReview = hotel.reviews.id(reviewId);
+        // If the review doesn't exist Mongoose returns null
+        if (!thisReview) {
+          response.status = 404;
+          response.message = {
+            "message" : "Review ID not found " + reviewId
+          };
+        }
+      }
+      if (response.status !== 200) {
+        res
+          .status(response.status)
+          .json(response.message);
+      } else {
+        hotel.reviews.id(reviewId).remove();
+        hotel.save(function(err, hotelUpdated) {
+          if (err) {
+            res
+              .status(500)
+              .json(err);
+          } else {
+            res
+              .status(204)
+              .json();
+          }
+        });
+      }
+    }); 
